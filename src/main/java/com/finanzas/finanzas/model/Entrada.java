@@ -24,6 +24,8 @@ public class Entrada {
     private BigDecimal valor;
     private LocalDate data;
     private boolean salario;
+    private String categoria = "outros";
+    private Long recorrenteId;
     private String userId;
 
     public Entrada() {}
@@ -75,4 +77,12 @@ public class Entrada {
     public void setUserId(String userId) {
         this.userId = userId;
     }
+
+    public Long getRecorrenteId() { return recorrenteId; }
+
+    public void setRecorrenteId(Long recorrenteId) { this.recorrenteId = recorrenteId; }
+
+    public String getCategoria() { return categoria; }
+
+    public void setCategoria(String categoria) { this.categoria = categoria; }
 }

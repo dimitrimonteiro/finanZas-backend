@@ -30,6 +30,7 @@ public class EntradaController {
     @PostMapping
     public Entrada createEntrada(@RequestBody Entrada entrada, @RequestParam String userId) {
         entrada.setUserId(userId);
+        entrada.setSalario("salario".equals(entrada.getCategoria()));
         return entradaRepository.save(entrada);
     }
 
@@ -45,7 +46,8 @@ public class EntradaController {
             entrada.setDescricao(entradaDetails.getDescricao());
             entrada.setValor(entradaDetails.getValor());
             entrada.setData(entradaDetails.getData());
-            entrada.setSalario(entradaDetails.isSalario());
+            entrada.setCategoria(entradaDetails.getCategoria());
+            entrada.setSalario("salario".equals(entradaDetails.getCategoria()));
             return entradaRepository.save(entrada);
         }
         return null;

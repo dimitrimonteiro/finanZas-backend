@@ -14,4 +14,6 @@ public interface EntradaRepository extends JpaRepository<Entrada, Long> {
 
     @Query("SELECT COALESCE(SUM(e.valor), 0) FROM Entrada e WHERE e.userId = :userId")
     BigDecimal sumValorByUserId(String userId);
+
+    boolean existsByRecorrenteIdAndDataBetween(Long recorrenteId, java.time.LocalDate inicio, java.time.LocalDate fim);
 }

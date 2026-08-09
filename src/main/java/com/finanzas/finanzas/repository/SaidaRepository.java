@@ -14,4 +14,6 @@ public interface SaidaRepository extends JpaRepository<Saida, Long> {
 
     @Query("SELECT COALESCE(SUM(s.valor), 0) FROM Saida s WHERE s.userId = :userId")
     BigDecimal sumValorByUserId(String userId);
+
+    boolean existsByRecorrenteIdAndDataBetween(Long recorrenteId, java.time.LocalDate inicio, java.time.LocalDate fim);
 }

@@ -25,6 +25,7 @@ public class Saida {
     private LocalDate data;
     private String tipo;
     private String userId;
+    private Long recorrenteId;
 
     public Long getId() {
         return id;
@@ -73,4 +74,8 @@ public class Saida {
     public void setUserId(String userId) {
         this.userId = userId;
     }
+
+    public Long getRecorrenteId() { return recorrenteId; }
+
+    public void setRecorrenteId(Long recorrenteId) { this.recorrenteId = recorrenteId; }
 }
