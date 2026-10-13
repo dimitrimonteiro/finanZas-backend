@@ -54,6 +54,7 @@ public class RecorrenteTransacaoController {
                     r.setValor(details.getValor());
                     r.setTipoTransacao(details.getTipoTransacao());
                     r.setTipoSaida(details.getTipoSaida());
+                    r.setCategoriaSaida(details.getCategoriaSaida());
                     r.setSalario(details.getSalario());
                     r.setDiaVencimento(details.getDiaVencimento());
                     r.setAtiva(details.getAtiva());
@@ -107,6 +108,7 @@ public class RecorrenteTransacaoController {
                     s.setValor(r.getValor());
                     s.setData(dataTransacao);
                     s.setTipo(r.getTipoSaida() != null ? r.getTipoSaida() : "fixa");
+                    s.setCategoria(r.getCategoriaSaida() != null ? r.getCategoriaSaida() : "outros");
                     s.setUserId(userId);
                     s.setRecorrenteId(r.getId());
                     saidaRepository.save(s);

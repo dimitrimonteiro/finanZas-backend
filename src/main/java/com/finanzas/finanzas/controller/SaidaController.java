@@ -46,6 +46,7 @@ public class SaidaController {
             saida.setValor(saidaDetails.getValor());
             saida.setData(saidaDetails.getData());
             saida.setTipo(saidaDetails.getTipo());
+            saida.setCategoria(saidaDetails.getCategoria());
             return saidaRepository.save(saida);
         }
         return null;

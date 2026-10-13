@@ -28,6 +28,8 @@ public class RecorrenteTransacao {
 
     private String tipoTransacao;
 
+    private String categoriaSaida = "outros";
+
     private String tipoSaida;
 
     private Boolean salario = false;
@@ -82,4 +84,8 @@ public class RecorrenteTransacao {
     public LocalDateTime getCriadoEm() { return criadoEm; }
 
     public void setCriadoEm(LocalDateTime criadoEm) { this.criadoEm = criadoEm; }
+
+    public String getCategoriaSaida() { return categoriaSaida; }
+
+    public void setCategoriaSaida(String categoriaSaida) { this.categoriaSaida = categoriaSaida; }
 }

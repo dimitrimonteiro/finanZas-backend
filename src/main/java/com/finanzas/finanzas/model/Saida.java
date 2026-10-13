@@ -21,6 +21,7 @@ public class Saida {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String descricao;
+    private String categoria = "outros";
     private BigDecimal valor;
     private LocalDate data;
     private String tipo;
@@ -78,4 +79,8 @@ public class Saida {
     public Long getRecorrenteId() { return recorrenteId; }
 
     public void setRecorrenteId(Long recorrenteId) { this.recorrenteId = recorrenteId; }
+
+    public String getCategoria() { return categoria; }
+
+    public void setCategoria(String categoria) { this.categoria = categoria; }
 }
