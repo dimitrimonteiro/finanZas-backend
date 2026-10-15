@@ -24,6 +24,7 @@ public class Saida {
     private String categoria = "outros";
     private BigDecimal valor;
     private LocalDate data;
+    private Long metaId;
     private String tipo;
     private String userId;
     private Long recorrenteId;
@@ -83,4 +84,8 @@ public class Saida {
     public String getCategoria() { return categoria; }
 
     public void setCategoria(String categoria) { this.categoria = categoria; }
+
+    public Long getMetaId() { return metaId; }
+
+    public void setMetaId(Long metaId) { this.metaId = metaId; }
 }

@@ -16,4 +16,6 @@ public interface SaidaRepository extends JpaRepository<Saida, Long> {
     BigDecimal sumValorByUserId(String userId);
 
     boolean existsByRecorrenteIdAndDataBetween(Long recorrenteId, java.time.LocalDate inicio, java.time.LocalDate fim);
+
+    List<Saida> findByUserIdAndMetaIdOrderByDataDesc(String userId, Long metaId);
 }
