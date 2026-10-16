@@ -5,6 +5,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Column;
+import jakarta.validation.constraints.*;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -22,18 +23,30 @@ public class RecorrenteTransacao {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank
+    @Size(max = 100)
     private String descricao;
 
+    @NotNull
+    @DecimalMin("0.01")
+    @DecimalMax("999999999.99")
     private BigDecimal valor;
 
+    @NotNull
+    @Pattern(regexp = "entrada|saida")
     private String tipoTransacao;
 
+    @Pattern(regexp = "moradia|alimentacao|transporte|lazer|saude|educacao|assinaturas|outros")
     private String categoriaSaida = "outros";
 
+    @Pattern(regexp = "fixa|variável")
     private String tipoSaida;
 
     private Boolean salario = false;
 
+    @NotNull
+    @Min(1)
+    @Max(28)
     private Integer diaVencimento;
 
     private Boolean ativa = true;

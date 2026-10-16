@@ -4,6 +4,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.*;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,11 +21,18 @@ public class Saida {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Size(max = 255)
     private String descricao;
+    @Pattern(regexp = "moradia|alimentacao|transporte|lazer|saude|educacao|assinaturas|outros|metas")
     private String categoria = "outros";
+    @NotNull
+    @DecimalMin("0.01")
+    @DecimalMax("999999999.99")
     private BigDecimal valor;
+    @NotNull
     private LocalDate data;
     private Long metaId;
+    @Pattern(regexp = "fixa|variável|aporte")
     private String tipo;
     private String userId;
     private Long recorrenteId;

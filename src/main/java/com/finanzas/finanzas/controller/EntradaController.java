@@ -2,8 +2,13 @@ package com.finanzas.finanzas.controller;
 
 import com.finanzas.finanzas.model.Entrada;
 import com.finanzas.finanzas.repository.EntradaRepository;
+import com.finanzas.finanzas.security.UsuarioAtual;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -17,47 +22,49 @@ public class EntradaController {
     private EntradaRepository entradaRepository;
 
     @GetMapping
-    public List<Entrada> getAllEntradas(@RequestParam String userId) {
-        return entradaRepository.findByUserId(userId);
+    public List<Entrada> getAllEntradas() {
+        return entradaRepository.findByUserId(UsuarioAtual.uid());
     }
 
     @GetMapping("/total")
-    public Map<String, BigDecimal> getTotalEntradas(@RequestParam String userId) {
-        BigDecimal total = entradaRepository.sumValorByUserId(userId);
-        return Map.of("total", total);
+    public Map<String, BigDecimal> getTotalEntradas() {
+        return Map.of("total", entradaRepository.sumValorByUserId(UsuarioAtual.uid()));
+    }
+
+    @GetMapping("/{id}")
+    public Entrada getEntradaById(@PathVariable Long id) {
+        return buscar(id);
     }
 
     @PostMapping
-    public Entrada createEntrada(@RequestBody Entrada entrada, @RequestParam String userId) {
-        entrada.setUserId(userId);
+    public Entrada createEntrada(@Valid @RequestBody Entrada entrada) {
+        entrada.setId(null); // impede sobrescrever um registro existente enviando um id
+        entrada.setUserId(UsuarioAtual.uid());
+        entrada.setRecorrenteId(null); // só o sistema define
+        if (entrada.getCategoria() == null) entrada.setCategoria("outros");
         entrada.setSalario("salario".equals(entrada.getCategoria()));
         return entradaRepository.save(entrada);
     }
 
-    @GetMapping("/{id}")
-    public Entrada getEntradaById(@PathVariable Long id, @RequestParam String userId) {
-        return entradaRepository.findById(id).filter(e -> e.getUserId().equals(userId)).orElse(null);
-    }
-
     @PutMapping("/{id}")
-    public Entrada updateEntrada(@PathVariable Long id, @RequestBody Entrada entradaDetails, @RequestParam String userId) {
-        Entrada entrada = entradaRepository.findById(id).orElse(null);
-        if (entrada != null && entrada.getUserId().equals(userId)) {
-            entrada.setDescricao(entradaDetails.getDescricao());
-            entrada.setValor(entradaDetails.getValor());
-            entrada.setData(entradaDetails.getData());
-            entrada.setCategoria(entradaDetails.getCategoria());
-            entrada.setSalario("salario".equals(entradaDetails.getCategoria()));
-            return entradaRepository.save(entrada);
-        }
-        return null;
+    public Entrada updateEntrada(@PathVariable Long id, @Valid @RequestBody Entrada detalhes) {
+        Entrada entrada = buscar(id);
+        entrada.setDescricao(detalhes.getDescricao());
+        entrada.setValor(detalhes.getValor());
+        entrada.setData(detalhes.getData());
+        entrada.setCategoria(detalhes.getCategoria() != null ? detalhes.getCategoria() : "outros");
+        entrada.setSalario("salario".equals(entrada.getCategoria()));
+        return entradaRepository.save(entrada);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteEntrada(@PathVariable Long id, @RequestParam String userId) {
-        Entrada entrada = entradaRepository.findById(id).orElse(null);
-        if (entrada != null && entrada.getUserId().equals(userId)) {
-            entradaRepository.deleteById(id);
-        }
+    public ResponseEntity<Void> deleteEntrada(@PathVariable Long id) {
+        entradaRepository.delete(buscar(id));
+        return ResponseEntity.noContent().build();
+    }
+
+    private Entrada buscar(Long id) {
+        return entradaRepository.findByIdAndUserId(id, UsuarioAtual.uid())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Entrada não encontrada."));
     }
 }

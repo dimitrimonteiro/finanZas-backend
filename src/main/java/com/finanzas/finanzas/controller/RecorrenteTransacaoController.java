@@ -6,9 +6,14 @@ import com.finanzas.finanzas.model.Saida;
 import com.finanzas.finanzas.repository.EntradaRepository;
 import com.finanzas.finanzas.repository.RecorrenteTransacaoRepository;
 import com.finanzas.finanzas.repository.SaidaRepository;
+import com.finanzas.finanzas.security.UsuarioAtual;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -28,54 +33,42 @@ public class RecorrenteTransacaoController {
     private SaidaRepository saidaRepository;
 
     @GetMapping
-    public List<RecorrenteTransacao> getAll(@RequestParam String userId) {
-        return recorrenteRepository.findByUserId(userId);
+    public List<RecorrenteTransacao> getAll() {
+        return recorrenteRepository.findByUserId(UsuarioAtual.uid());
     }
 
     @PostMapping
-    public RecorrenteTransacao create(@RequestBody RecorrenteTransacao r, @RequestParam String userId) {
-        r.setUserId(userId);
+    public RecorrenteTransacao create(@Valid @RequestBody RecorrenteTransacao r) {
+        r.setId(null);
+        r.setUserId(UsuarioAtual.uid());
         if (r.getAtiva() == null) r.setAtiva(true);
         return recorrenteRepository.save(r);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<RecorrenteTransacao> update(
-            @PathVariable Long id,
-            @RequestBody RecorrenteTransacao details,
-            @RequestParam String userId) {
-
-        return recorrenteRepository.findById(id)
-                .map(r -> {
-                    if (!r.getUserId().equals(userId)) {
-                        return ResponseEntity.status(403).<RecorrenteTransacao>build();
-                    }
-                    r.setDescricao(details.getDescricao());
-                    r.setValor(details.getValor());
-                    r.setTipoTransacao(details.getTipoTransacao());
-                    r.setTipoSaida(details.getTipoSaida());
-                    r.setCategoriaSaida(details.getCategoriaSaida());
-                    r.setSalario(details.getSalario());
-                    r.setDiaVencimento(details.getDiaVencimento());
-                    r.setAtiva(details.getAtiva());
-                    return ResponseEntity.ok(recorrenteRepository.save(r));
-                })
-                .orElseGet(() -> ResponseEntity.notFound().build());
+    public RecorrenteTransacao update(@PathVariable Long id, @Valid @RequestBody RecorrenteTransacao detalhes) {
+        RecorrenteTransacao r = buscar(id);
+        r.setDescricao(detalhes.getDescricao());
+        r.setValor(detalhes.getValor());
+        r.setTipoTransacao(detalhes.getTipoTransacao());
+        r.setTipoSaida(detalhes.getTipoSaida());
+        r.setCategoriaSaida(detalhes.getCategoriaSaida());
+        r.setSalario(detalhes.getSalario());
+        r.setDiaVencimento(detalhes.getDiaVencimento());
+        r.setAtiva(detalhes.getAtiva());
+        return recorrenteRepository.save(r);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable Long id, @RequestParam String userId) {
-        return recorrenteRepository.findById(id).map(r -> {
-            if (!r.getUserId().equals(userId)) {
-                return ResponseEntity.status(403).build();
-            }
-            recorrenteRepository.delete(r);
-            return ResponseEntity.ok().build();
-        }).orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        recorrenteRepository.delete(buscar(id));
+        return ResponseEntity.noContent().build();
     }
 
+    @Transactional
     @PostMapping("/gerar")
-    public ResponseEntity<Map<String, Object>> gerar(@RequestParam String userId) {
+    public Map<String, Object> gerar() {
+        String userId = UsuarioAtual.uid();
         List<RecorrenteTransacao> ativas = recorrenteRepository.findByUserIdAndAtivaTrue(userId);
         LocalDate hoje = LocalDate.now();
         LocalDate inicioMes = hoje.withDayOfMonth(1);
@@ -88,21 +81,21 @@ public class RecorrenteTransacaoController {
             LocalDate dataTransacao = LocalDate.of(hoje.getYear(), hoje.getMonth(), dia);
 
             if ("entrada".equals(r.getTipoTransacao())) {
-                boolean existe = entradaRepository.existsByRecorrenteIdAndDataBetween(r.getId(), inicioMes, fimMes);
-                if (!existe) {
+                if (!entradaRepository.existsByRecorrenteIdAndDataBetween(r.getId(), inicioMes, fimMes)) {
+                    boolean salario = Boolean.TRUE.equals(r.getSalario());
                     Entrada e = new Entrada();
                     e.setDescricao(r.getDescricao());
                     e.setValor(r.getValor());
                     e.setData(dataTransacao);
-                    e.setSalario(Boolean.TRUE.equals(r.getSalario()));
+                    e.setCategoria(salario ? "salario" : "outros");
+                    e.setSalario(salario);
                     e.setUserId(userId);
                     e.setRecorrenteId(r.getId());
                     entradaRepository.save(e);
                     criadas++;
                 }
             } else if ("saida".equals(r.getTipoTransacao())) {
-                boolean existe = saidaRepository.existsByRecorrenteIdAndDataBetween(r.getId(), inicioMes, fimMes);
-                if (!existe) {
+                if (!saidaRepository.existsByRecorrenteIdAndDataBetween(r.getId(), inicioMes, fimMes)) {
                     Saida s = new Saida();
                     s.setDescricao(r.getDescricao());
                     s.setValor(r.getValor());
@@ -117,6 +110,11 @@ public class RecorrenteTransacaoController {
             }
         }
 
-        return ResponseEntity.ok(Map.of("criadas", criadas));
+        return Map.of("criadas", criadas);
+    }
+
+    private RecorrenteTransacao buscar(Long id) {
+        return recorrenteRepository.findByIdAndUserId(id, UsuarioAtual.uid())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Recorrência não encontrada."));
     }
 }

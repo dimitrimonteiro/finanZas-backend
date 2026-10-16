@@ -5,6 +5,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Column;
+import jakarta.validation.constraints.*;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -23,13 +24,22 @@ public class MetaFinanceira {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank
+    @Size(max = 100)
     private String nomeMeta;
 
+    @NotNull
+    @DecimalMin("0.01")
+    @DecimalMax("999999999.99")
     private BigDecimal valorObjetivo;
+
+    @DecimalMin("0.00")
     private BigDecimal valorAtual;
 
+    @NotNull
     private LocalDate dataLimite;
 
+    @Pattern(regexp = "viagem|reserva|compra|investimento|outros")
     private String categoria;
 
     private String userId;

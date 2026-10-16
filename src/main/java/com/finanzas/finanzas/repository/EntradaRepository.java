@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface EntradaRepository extends JpaRepository<Entrada, Long> {
@@ -16,4 +17,6 @@ public interface EntradaRepository extends JpaRepository<Entrada, Long> {
     BigDecimal sumValorByUserId(String userId);
 
     boolean existsByRecorrenteIdAndDataBetween(Long recorrenteId, java.time.LocalDate inicio, java.time.LocalDate fim);
+
+    Optional<Entrada> findByIdAndUserId(Long id, String userId);
 }

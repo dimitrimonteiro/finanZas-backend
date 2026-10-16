@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface SaidaRepository extends JpaRepository<Saida, Long> {
@@ -18,4 +19,6 @@ public interface SaidaRepository extends JpaRepository<Saida, Long> {
     boolean existsByRecorrenteIdAndDataBetween(Long recorrenteId, java.time.LocalDate inicio, java.time.LocalDate fim);
 
     List<Saida> findByUserIdAndMetaIdOrderByDataDesc(String userId, Long metaId);
+
+    Optional<Saida> findByIdAndUserId(Long id, String userId);
 }

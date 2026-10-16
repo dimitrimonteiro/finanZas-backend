@@ -4,6 +4,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.*;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,10 +21,16 @@ public class Entrada {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Size(max = 255)
     private String descricao;
+    @NotNull
+    @DecimalMin("0.01")
+    @DecimalMax("999999999.99")
     private BigDecimal valor;
+    @NotNull
     private LocalDate data;
     private boolean salario;
+    @Pattern(regexp = "salario|freelance|investimento|presente|reembolso|outros")
     private String categoria = "outros";
     private Long recorrenteId;
     private String userId;

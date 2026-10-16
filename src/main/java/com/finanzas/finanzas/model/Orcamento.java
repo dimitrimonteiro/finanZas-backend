@@ -4,6 +4,9 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -22,7 +25,10 @@ public class Orcamento {
 
     private String categoria;
 
-    private BigDecimal limite; // limite mensal
+    @NotNull
+    @DecimalMin("0.01")
+    @DecimalMax("999999999.99")
+    private BigDecimal limite;
 
     private String userId;
 
