@@ -31,7 +31,7 @@ public class CodigoVinculoService {
 
     public String gerar(String userId) {
         limpar();
-        codigos.values().removeIf(r -> r.userId().equals(userId)); // um código ativo por usuário
+        codigos.values().removeIf(r -> r.userId().equals(userId));
 
         String codigo;
         do {
@@ -46,7 +46,6 @@ public class CodigoVinculoService {
         return codigo;
     }
 
-    /** Uso único: o código é removido ao ser consumido. */
     public Optional<String> consumir(String codigo) {
         if (codigo == null) return Optional.empty();
         Registro registro = codigos.remove(codigo.trim().toUpperCase());

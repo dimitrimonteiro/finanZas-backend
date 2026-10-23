@@ -80,7 +80,7 @@ public class SaidaController {
         return saidaRepository.findByIdAndUserId(id, UsuarioAtual.uid())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Saída não encontrada."));
     }
-
+    
     private void rejeitarValoresReservados(Saida s) {
         if ("aporte".equals(s.getTipo()) || "metas".equals(s.getCategoria())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Valor reservado para o sistema.");

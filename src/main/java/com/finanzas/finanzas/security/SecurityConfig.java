@@ -51,6 +51,7 @@ public class SecurityConfig {
         return http.build();
     }
 
+    // Valida o ID Token do Firebase: assinatura, emissor e projeto (audience)
     @Bean
     public JwtDecoder jwtDecoder(@Value("${app.firebase.project-id}") String projectId) {
         NimbusJwtDecoder decoder = NimbusJwtDecoder.withJwkSetUri(FIREBASE_JWK_URI).build();

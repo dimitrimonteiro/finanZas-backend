@@ -67,7 +67,6 @@ public class MetaFinanceiraController {
     public ResponseEntity<Void> deleteMeta(@PathVariable Long id) {
         String userId = UsuarioAtual.uid();
         MetaFinanceira meta = buscar(id);
-
         List<Saida> aportes = saidaRepository.findByUserIdAndMetaIdOrderByDataDesc(userId, id);
         aportes.forEach(s -> {
             s.setMetaId(null);
@@ -79,7 +78,6 @@ public class MetaFinanceiraController {
         metaFinanceiraRepository.delete(meta);
         return ResponseEntity.noContent().build();
     }
-
 
     @GetMapping("/{id}/aportes")
     public List<Saida> listarAportes(@PathVariable Long id) {
